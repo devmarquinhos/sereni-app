@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/src/stores/useAuthStore';
 import { useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import { useState } from 'react';
@@ -7,6 +8,7 @@ import { api } from '../../src/services/api';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const setToken = useAuthStore((state) => state.setToken);
   const [loading, setLoading] = useState(false);
   
   const [email, setEmail] = useState('');
@@ -18,6 +20,8 @@ export default function LoginScreen() {
       const response = await api.post('/auth/login', { email, password });
       
       const { access_token } = response.data;
+
+      setToken(access_token);
 
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
