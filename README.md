@@ -1,50 +1,54 @@
-# Welcome to your Expo app 👋
+# Sereni
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicação cliente para o ecossistema **Sereni**, uma ferramenta de apoio à saúde mental. Desenvolvido com **React Native** e **Expo**, o aplicativo oferece uma interface para auxiliar no gerenciamento da ansiedade, conectando-se à Sereni API.
 
-## Get started
+## ✨ Funcionalidades Principais
 
-1. Install dependencies
+- **Autenticação:** Login e Cadastro de usuários.
+- **Diário de Emoções:** Registro diário de humor e notas pessoais.
+- **Trilhas de Aprendizado:** Módulos educativos para o usuário e sua rede de apoio.
+- **Lições Interativas:** Player de conteúdo com cards e quizzes.
+- **Botão SOS:** Acesso rápido a recursos de ajuda.
 
-   ```bash
-   npm install
-   ```
+## 🛠️ Tecnologias Utilizadas
 
-2. Start the app
+- **Core:** React Native, Expo, TypeScript
+- **Estilização:** NativeWind (Tailwind CSS)
+- **Estado & API:** Zustand, Axios
+- **Navegação:** Expo Router
 
-   ```bash
-   npx expo start
-   ```
+## 🚀 Como Rodar o Projeto
 
-In the output, you'll find options to open the app in a
+Pré-requisitos: Node.js instalado.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 1. Instalação
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Na pasta do projeto, instale as dependências:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Configuração da API
 
-## Learn more
+Antes de iniciar, verifique o arquivo `src/services/api.ts` e certifique-se de que o `baseURL` aponta para o endereço IP do seu backend rodando localmente:
 
-To learn more about developing your project with Expo, look at the following resources:
+```typescript
+export const api = axios.create({
+  baseURL: "http://SEU_IP_LOCAL:3000",
+});
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### 3. Execução
 
-## Join the community
+Inicie o servidor de desenvolvimento:
 
-Join our community of developers creating universal apps.
+```bash
+npx expo start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Utilize o app **Expo Go** (Android/iOS) para escanear o QR Code ou execute em um emulador pressionando `a` (Android) ou `i` (iOS).
+
+## 📜 Licença
+
+Este projeto está sob a licença MIT.
