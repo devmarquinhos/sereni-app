@@ -35,7 +35,7 @@ export default function ProfileScreen() {
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="flex-1">
         {/* header */}
-        <View className="bg-white pb-8 pt-4 px-6 rounded-b-[32px] shadow-sm items-center border-b border-gray-100">
+        <View className="pb-8 pt-4 px-6 items-center">
           <View className="w-24 h-24 bg-primaryLight rounded-full items-center justify-center mb-4 border-4 border-white shadow-sm">
             <User size={40} color="#6366F1" />
           </View>
