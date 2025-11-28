@@ -1,9 +1,12 @@
 import { AlertCircle, ChevronRight, Heart, Wind } from 'lucide-react-native';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { api } from '../../src/services/api';
 
 export default function HomeScreen() {
-  const userName = "Marcos"; // trocar dps para consumo pela api
+  const [user, setUser] = useState<{ name: string } | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const moodOptions = [
     { level: 1, emoji: '😡', color: 'bg-red-100' },
@@ -13,21 +16,43 @@ export default function HomeScreen() {
     { level: 5, emoji: '🥰', color: 'bg-green-100' },
   ];
 
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const response = await api.get('/auth/me');
+        setUser(response.data);
+      } catch (error) {
+        console.log('Erro ao carregar usuário:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUser();
+  }, []);
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="px-6 pt-4" showsVerticalScrollIndicator={false}>
         
-        {/* parte de cima */}
+        {/* header */}
         <View className="mb-8 mt-2">
-          <Text className="font-bold text-3xl text-text mb-1">
-            Olá, {userName} 👋
-          </Text>
+          {loading ? (
+             <View className="flex-row items-center">
+               <Text className="font-bold text-3xl text-text mr-2">Olá,</Text>
+               <ActivityIndicator color="#6366F1" />
+             </View>
+          ) : (
+            <Text className="font-bold text-3xl text-text mb-1">
+              Olá, {user?.name?.split(' ')[0] || 'Visitante'} 👋
+            </Text>
+          )}
           <Text className="font-regular text-lg text-textLight">
             Vamos cuidar de você hoje.
           </Text>
         </View>
 
-        {/* card do registro diario */}
+        {/* card dos sentimento diário */}
         <View className="bg-surface p-6 rounded-3xl shadow-sm mb-8 border border-gray-100">
           <Text className="font-semibold text-lg text-text mb-4">
             Como você se sente agora?
@@ -44,7 +69,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* parte da pratica diaria */}
+        {/* prática */}
         <Text className="font-semibold text-xl text-text mb-4">
           Sua Prática Diária
         </Text>
@@ -66,7 +91,7 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* info para rede de apoio */}
+        {/* rede de apoio */}
         <Text className="font-semibold text-xl text-text mb-4">
           Para quem você ama
         </Text>
@@ -90,7 +115,7 @@ export default function HomeScreen() {
 
       </ScrollView>
 
-      {/* botão sos */}
+      {/* sos */}
       <View className="absolute bottom-6 w-full px-6">
         <TouchableOpacity className="bg-sos py-4 rounded-2xl flex-row items-center justify-center shadow-lg active:opacity-90">
           <AlertCircle color="white" size={24} className="mr-2" />
