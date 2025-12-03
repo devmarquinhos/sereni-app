@@ -1,11 +1,22 @@
+import { api } from '@/src/services/api';
+import { useAuthStore } from '@/src/stores/useAuthStore';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ShieldCheck } from 'lucide-react-native';
+import { useEffect } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const token = useAuthStore((state) => state.token);
+
+  useEffect(() => {
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      router.replace('/(tabs)');
+    }
+  }, [token]);
 
   return (
     <SafeAreaView className="flex-1 bg-background justify-between p-6">

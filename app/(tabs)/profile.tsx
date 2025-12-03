@@ -8,7 +8,7 @@ import { useAuthStore } from '../../src/stores/useAuthStore';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const logout = useAuthStore((state) => state.logout);
+  const { logout, user: storedUser } = useAuthStore();
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,9 +25,10 @@ export default function ProfileScreen() {
       { 
         text: "Sair", 
         style: "destructive",
-        onPress: () => {
-          logout();
-          router.replace('/');
+        onPress: async () => {
+          await logout();
+          router.replace('/(auth)/login');
+          console.log("Usuário deslogado");
         }
       }
     ]);
