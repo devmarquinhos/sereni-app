@@ -26,9 +26,14 @@ export default function ProfileScreen() {
         text: "Sair", 
         style: "destructive",
         onPress: async () => {
-          await logout();
-          router.replace('/(auth)/login');
+          logout();
+
+          setTimeout(() => {
+            router.replace('/(auth)/login');
+
+          }, 100)
           console.log("Usuário deslogado");
+
         }
       }
     ]);
