@@ -43,6 +43,7 @@ export default function RegisterScreen() {
         "Erro",
         "Não foi possível criar a conta. Verifique seus dados.",
       );
+      console.log(error);
     } finally {
       setLoading(false);
     }
