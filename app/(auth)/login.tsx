@@ -24,22 +24,21 @@ export default function LoginScreen() {
   async function handleLogin() {
     try {
       setLoading(true);
-      const response = await api.post(`${api.defaults.baseURL}/auth/login`, {
+      const response = await api.post("/auth/login", {
         email,
         password,
       });
 
       const { access_token } = response.data;
-
       setToken(access_token);
 
       api.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
 
-      console.log("Token recebido:", access_token);
-
       router.replace("/(tabs)");
-    } catch (error) {
-      Alert.alert("Erro", "E-mail ou senha inválidos.");
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || "Verifique suas credenciais.";
+      Alert.alert("Erro ao entrar", message);
     } finally {
       setLoading(false);
     }

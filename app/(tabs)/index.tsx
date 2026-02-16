@@ -1,50 +1,60 @@
-import { AlertCircle, ChevronRight, Heart, Wind } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { api } from '../../src/services/api';
+import { useRouter } from "expo-router";
+import { AlertCircle, ChevronRight, Heart, Wind } from "lucide-react-native";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { api } from "../../src/services/api";
 
 export default function HomeScreen() {
   const [user, setUser] = useState<{ name: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const moodOptions = [
-    { level: 1, emoji: '😡', color: 'bg-red-100' },
-    { level: 2, emoji: '😕', color: 'bg-orange-100' },
-    { level: 3, emoji: '😐', color: 'bg-yellow-100' },
-    { level: 4, emoji: '🙂', color: 'bg-lime-100' },
-    { level: 5, emoji: '🥰', color: 'bg-green-100' },
+    { level: 1, emoji: "😡", color: "bg-red-100" },
+    { level: 2, emoji: "😕", color: "bg-orange-100" },
+    { level: 3, emoji: "😐", color: "bg-yellow-100" },
+    { level: 4, emoji: "🙂", color: "bg-lime-100" },
+    { level: 5, emoji: "🥰", color: "bg-green-100" },
   ];
 
   useEffect(() => {
     async function fetchUser() {
       try {
-        const response = await api.get('/auth/me');
+        const response = await api.get("/auth/me");
         setUser(response.data);
-      } catch (error) {
-        console.log('Erro ao carregar usuário:', error);
+      } catch (error: any) {
+        if (error.response?.status === 401) {
+          // Token expirou ou inválido
+          router.replace("/(auth)/login");
+        }
+        console.log("Erro ao carregar usuário:", error);
       } finally {
         setLoading(false);
       }
     }
-
     fetchUser();
   }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="px-6 pt-4" showsVerticalScrollIndicator={false}>
-        
         {/* header */}
         <View className="mb-8 mt-2">
           {loading ? (
-             <View className="flex-row items-center">
-               <Text className="font-bold text-3xl text-text mr-2">Olá,</Text>
-               <ActivityIndicator color="#6366F1" />
-             </View>
+            <View className="flex-row items-center">
+              <Text className="font-bold text-3xl text-text mr-2">Olá,</Text>
+              <ActivityIndicator color="#6366F1" />
+            </View>
           ) : (
             <Text className="font-bold text-3xl text-text mb-1">
-              Olá, {user?.name?.split(' ')[0] || 'Visitante'} 👋
+              Olá, {user?.name?.split(" ")[0] || "Visitante"} 👋
             </Text>
           )}
           <Text className="font-regular text-lg text-textLight">
@@ -59,7 +69,7 @@ export default function HomeScreen() {
           </Text>
           <View className="flex-row justify-between">
             {moodOptions.map((option) => (
-              <TouchableOpacity 
+              <TouchableOpacity
                 key={option.level}
                 className={`w-12 h-12 ${option.color} rounded-full items-center justify-center active:scale-90 transition-transform`}
               >
@@ -73,7 +83,7 @@ export default function HomeScreen() {
         <Text className="font-semibold text-xl text-text mb-4">
           Sua Prática Diária
         </Text>
-        
+
         <TouchableOpacity className="bg-primaryLight p-5 rounded-3xl flex-row items-center mb-6 border border-indigo-100">
           <View className="w-12 h-12 bg-white rounded-2xl items-center justify-center mr-4">
             <Wind size={24} color="#6366F1" />
@@ -87,7 +97,7 @@ export default function HomeScreen() {
             </Text>
           </View>
           <View className="bg-primary w-8 h-8 rounded-full items-center justify-center">
-             <ChevronRight size={20} color="white" />
+            <ChevronRight size={20} color="white" />
           </View>
         </TouchableOpacity>
 
@@ -108,11 +118,10 @@ export default function HomeScreen() {
               Guia Prático • Leitura Rápida
             </Text>
           </View>
-           <View className="bg-secondary w-8 h-8 rounded-full items-center justify-center">
-             <ChevronRight size={20} color="white" />
+          <View className="bg-secondary w-8 h-8 rounded-full items-center justify-center">
+            <ChevronRight size={20} color="white" />
           </View>
         </TouchableOpacity>
-
       </ScrollView>
 
       {/* sos */}
@@ -124,7 +133,6 @@ export default function HomeScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-
     </SafeAreaView>
   );
 }
