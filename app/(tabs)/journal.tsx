@@ -1,4 +1,4 @@
-import { Plus, Smile, X } from "lucide-react-native"; // Ícones
+import { Plus, Smile, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -28,11 +29,15 @@ export default function JournalScreen() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // states do modal
+  // states do modal de criação
   const [isModalVisible, setModalVisible] = useState(false);
   const [newMood, setNewMood] = useState(3);
   const [newText, setNewText] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // states do modal de leitura
+  const [isReadModalVisible, setReadModalVisible] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
 
   // fetch da api
   async function fetchEntries() {
@@ -89,43 +94,68 @@ export default function JournalScreen() {
   ];
 
   // render da lista de registros
-  const renderItem = ({ item }: { item: JournalEntry }) => (
-    <View className="bg-white p-4 rounded-2xl mb-3 border border-gray-100 shadow-sm">
-      <View className="flex-row justify-between items-start mb-2">
-        <View className="flex-row items-center">
-          <View
-            className={`w-8 h-8 rounded-full items-center justify-center mr-3 ${
-              item.mood_rating >= 4
-                ? "bg-green-100"
-                : item.mood_rating === 3
-                  ? "bg-yellow-100"
-                  : "bg-red-100"
-            }`}
-          >
-            <Text>
-              {item.mood_rating === 5
-                ? "🥰"
-                : item.mood_rating === 4
-                  ? "🙂"
+  const renderItem = ({ item }: { item: JournalEntry }) => {
+    const isLongText = item.entry_text && item.entry_text.length > 80;
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          if (item.entry_text) {
+            setSelectedEntry(item);
+            setReadModalVisible(true);
+          }
+        }}
+        className="bg-white p-4 rounded-2xl mb-3 border border-gray-100 shadow-sm"
+      >
+        <View className="flex-row justify-between items-start mb-2">
+          <View className="flex-row items-center">
+            <View
+              className={`w-8 h-8 rounded-full items-center justify-center mr-3 ${
+                item.mood_rating >= 4
+                  ? "bg-green-100"
                   : item.mood_rating === 3
-                    ? "😐"
-                    : item.mood_rating === 2
-                      ? "😕"
-                      : "😡"}
+                    ? "bg-yellow-100"
+                    : "bg-red-100"
+              }`}
+            >
+              <Text>
+                {item.mood_rating === 5
+                  ? "🥰"
+                  : item.mood_rating === 4
+                    ? "🙂"
+                    : item.mood_rating === 3
+                      ? "😐"
+                      : item.mood_rating === 2
+                        ? "😕"
+                        : "😡"}
+              </Text>
+            </View>
+            <Text className="text-gray-400 text-xs font-medium">
+              {formatDateSimple(item.created_at)}
             </Text>
           </View>
-          <Text className="text-gray-400 text-xs font-medium">
-            {formatDateSimple(item.created_at)}
-          </Text>
         </View>
-      </View>
-      {item.entry_text && (
-        <Text className="text-gray-700 text-base leading-6">
-          {item.entry_text}
-        </Text>
-      )}
-    </View>
-  );
+        {item.entry_text && (
+          <View>
+            <Text
+              className="text-gray-700 text-base leading-6"
+              numberOfLines={3}
+              ellipsizeMode="tail"
+            >
+              {item.entry_text}
+            </Text>
+
+            {isLongText && (
+              <Text className="text-indigo-500 font-semibold text-sm mt-2">
+                Ler nota completa...
+              </Text>
+            )}
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   // formata a data para a exibicao simples
   function formatDateSimple(dateString: string) {
@@ -142,7 +172,7 @@ export default function JournalScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
-      {/* Cabeçalho */}
+      {/* cabeçalho */}
       <View className="px-6 py-4 bg-white border-b border-gray-100">
         <Text className="text-2xl font-bold text-slate-800">Seu Diário 📖</Text>
         <Text className="text-slate-500">Acompanhe sua jornada emocional.</Text>
@@ -176,21 +206,18 @@ export default function JournalScreen() {
         <Plus color="white" size={24} />
       </TouchableOpacity>
 
-      {/* modal */}
+      {/* modal de nova nota diária */}
       <Modal
         visible={isModalVisible}
         transparent={true}
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        {/* Fundo Escuro Transparente */}
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           className="flex-1 justify-end bg-black/60"
         >
-          {/* Conteúdo do Popup (Estilo Bottom Sheet) */}
           <View className="bg-white rounded-t-3xl p-6 h-[70%]">
-            {/* Header do Modal */}
             <View className="flex-row justify-between items-center mb-6">
               <Text className="text-xl font-bold text-slate-800">
                 Como você está? ✨
@@ -203,7 +230,6 @@ export default function JournalScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* selecao do humor */}
             <Text className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider">
               Humor
             </Text>
@@ -223,7 +249,6 @@ export default function JournalScreen() {
               ))}
             </View>
 
-            {/* caixa de texto do modal */}
             <Text className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider">
               Notas
             </Text>
@@ -236,7 +261,6 @@ export default function JournalScreen() {
               onChangeText={setNewText}
             />
 
-            {/* salvar */}
             <TouchableOpacity
               onPress={handleSave}
               disabled={saving}
@@ -252,6 +276,63 @@ export default function JournalScreen() {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* modal de leitura */}
+      <Modal
+        visible={isReadModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setReadModalVisible(false)}
+      >
+        <View className="flex-1 justify-center bg-black/60 p-6">
+          <View className="bg-white rounded-3xl p-6 max-h-[80%] shadow-lg">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-xl font-bold text-slate-800">
+                Seu Dia 📖
+              </Text>
+              <TouchableOpacity
+                onPress={() => setReadModalVisible(false)}
+                className="p-2 bg-gray-100 rounded-full"
+              >
+                <X size={20} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            {/* conteúdo da nota */}
+            {selectedEntry && (
+              <>
+                <View className="flex-row items-center mb-6 pb-4 border-b border-gray-100">
+                  <View
+                    className={`w-10 h-10 rounded-full items-center justify-center mr-3 ${
+                      selectedEntry.mood_rating >= 4
+                        ? "bg-green-100"
+                        : selectedEntry.mood_rating === 3
+                          ? "bg-yellow-100"
+                          : "bg-red-100"
+                    }`}
+                  >
+                    <Text className="text-2xl">
+                      {moodOptions.find(
+                        (m) => m.level === selectedEntry.mood_rating,
+                      )?.emoji || "😐"}
+                    </Text>
+                  </View>
+                  <Text className="text-slate-500 font-medium">
+                    {formatDateSimple(selectedEntry.created_at)}
+                  </Text>
+                </View>
+
+                {/* texto rolável */}
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  <Text className="text-slate-700 text-base leading-7">
+                    {selectedEntry.entry_text}
+                  </Text>
+                </ScrollView>
+              </>
+            )}
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
