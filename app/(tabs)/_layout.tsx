@@ -43,6 +43,21 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Compass size={24} color={color} />,
         }}
       />
+      
+      {/* opt psicologos */}
+      <Tabs.Screen
+        name="psychologists"
+        options={{
+          title: "Apoio",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol
+              size={28}
+              name="stethoscope.circle.fill"
+              color={color}
+            />
+          ),
+        }}
+      />
 
       {/* opt diario */}
       <Tabs.Screen
@@ -62,19 +77,6 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="psychologists"
-        options={{
-          title: "Apoio",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol
-              size={28}
-              name="stethoscope.circle.fill"
-              color={color}
-            />
-          ),
-        }}
-      />
     </Tabs>
   );
 }
