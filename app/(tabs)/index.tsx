@@ -84,7 +84,7 @@ export default function HomeScreen() {
           Sua Prática Diária
         </Text>
 
-        <TouchableOpacity className="bg-primaryLight p-5 rounded-3xl flex-row items-center mb-6 border border-indigo-100">
+        <TouchableOpacity className="bg-primaryLight p-5 rounded-3xl flex-row items-center mb-6 border border-indigo-100" onPress={() => router.push('/breathing')}>
           <View className="w-12 h-12 bg-white rounded-2xl items-center justify-center mr-4">
             <Wind size={24} color="#6366F1" />
           </View>
