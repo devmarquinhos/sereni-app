@@ -1,10 +1,14 @@
 import { useRouter } from "expo-router";
-import { AlertCircle, ChevronRight, Heart, Wind } from "lucide-react-native";
+import { AlertCircle, ChevronRight, Heart, Wind, X} from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -13,8 +17,26 @@ import { api } from "../../src/services/api";
 
 export default function HomeScreen() {
   const [user, setUser] = useState<{ name: string } | null>(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [newMood, setNewMood] = useState<number | null>(null); // Ajuste o tipo se o seu 'level' for string
+  const [newText, setNewText] = useState('');
+  const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const handleSave = async () => {
+    setSaving(true);
+    // Aqui vai a lógica da sua API
+    console.log(`Salvando humor level: ${newMood} | Texto: ${newText}`);
+    
+    // Simula tempo de rede e fecha o modal
+    setTimeout(() => {
+      setSaving(false);
+      setModalVisible(false);
+      setNewText('');
+      setNewMood(null);
+    }, 1000);
+  };
 
   const moodOptions = [
     { level: 1, emoji: "😡", color: "bg-red-100" },
@@ -72,6 +94,10 @@ export default function HomeScreen() {
               <TouchableOpacity
                 key={option.level}
                 className={`w-12 h-12 ${option.color} rounded-full items-center justify-center active:scale-90 transition-transform`}
+                onPress={() => {
+                  setNewMood(option.level);
+                  setModalVisible(true);
+                }}
               >
                 <Text className="text-2xl">{option.emoji}</Text>
               </TouchableOpacity>
@@ -84,7 +110,10 @@ export default function HomeScreen() {
           Sua Prática Diária
         </Text>
 
-        <TouchableOpacity className="bg-primaryLight p-5 rounded-3xl flex-row items-center mb-6 border border-indigo-100" onPress={() => router.push('/breathing')}>
+        <TouchableOpacity
+          className="bg-primaryLight p-5 rounded-3xl flex-row items-center mb-6 border border-indigo-100"
+          onPress={() => router.push("/breathing")}
+        >
           <View className="w-12 h-12 bg-white rounded-2xl items-center justify-center mr-4">
             <Wind size={24} color="#6366F1" />
           </View>
@@ -133,6 +162,79 @@ export default function HomeScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+      
+      {/* modal de nota diária, vinculada nos emojis */}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1 justify-end bg-black/60"
+        >
+          <View className="bg-white rounded-t-3xl p-6 h-[70%]">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-xl font-bold text-slate-800">
+                Como você está? ✨
+              </Text>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                className="p-2 bg-gray-100 rounded-full"
+              >
+                <X size={20} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+
+            <Text className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider">
+              Humor
+            </Text>
+            <View className="flex-row justify-between mb-8">
+              {moodOptions.map((option) => (
+                <TouchableOpacity
+                  key={option.level}
+                  onPress={() => setNewMood(option.level)}
+                  className={`w-14 h-14 rounded-2xl items-center justify-center border-2 ${
+                    newMood === option.level
+                      ? option.color
+                      : "border-gray-100 bg-gray-50"
+                  }`}
+                >
+                  <Text className="text-2xl">{option.emoji}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text className="text-sm font-semibold text-slate-500 mb-3 uppercase tracking-wider">
+              Notas
+            </Text>
+            <TextInput
+              className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-base text-slate-800 flex-1 mb-6"
+              multiline
+              textAlignVertical="top"
+              placeholder="Escreva sobre o que aconteceu hoje..."
+              value={newText}
+              onChangeText={setNewText}
+            />
+
+            <TouchableOpacity
+              onPress={handleSave}
+              disabled={saving}
+              className={`w-full py-4 rounded-xl items-center mb-4 ${saving ? "bg-indigo-400" : "bg-indigo-600"}`}
+            >
+              {saving ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text className="text-white font-bold text-lg">
+                  Salvar Diário
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+      
     </SafeAreaView>
   );
 }
