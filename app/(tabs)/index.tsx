@@ -39,7 +39,7 @@ export default function HomeScreen() {
       });
 
       setNewText("");
-      setNewMood(3);
+      setNewMood(null);
       setModalVisible(false);
 
       Alert.alert("Sucesso!", "Seu registro foi salvo no diário.");

@@ -1,5 +1,6 @@
+import { useFocusEffect } from "expo-router"
 import { Plus, Smile, X } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -51,9 +52,9 @@ export default function JournalScreen() {
     }
   }
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     fetchEntries();
-  }, []);
+  }, []));
 
   // salva um novo registro
   async function handleSave() {
