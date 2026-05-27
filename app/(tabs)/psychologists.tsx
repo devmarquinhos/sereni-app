@@ -1,5 +1,5 @@
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Linking,
-  Image,
+  Image, // Importação da Imagem mantida
 } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from "react-native-safe-area-context";
 import { api } from "../../src/services/api";
 
 // tipagem para os psicologos
@@ -28,9 +28,11 @@ export default function PsychologistsScreen() {
   const [professionals, setProfessionals] = useState<Psychologist[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useFocusEffect(useCallback(() => {
-    loadProfessionals();
-  }, []));
+  useFocusEffect(
+    useCallback(() => {
+      loadProfessionals();
+    }, []),
+  );
 
   const loadProfessionals = async () => {
     try {
@@ -49,41 +51,51 @@ export default function PsychologistsScreen() {
     }
   };
 
-  const renderItem = ({ item }: { item: Psychologist }) => (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <View style={styles.avatarPlaceholder}>
-          <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
-        </View>
-        <View style={styles.info}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.crp}>CRP: {item.crp}</Text>
-        </View>
-      </View>
+  // Aqui transformamos em uma função com chaves { } para poder criar a variável da imagem antes de renderizar
+  const renderItem = ({ item }: { item: Psychologist }) => {
+    const imageUrl = item.avatarUrl ? item.avatarUrl : `https://i.pravatar.cc/150?u=${item.id}`;
 
-      <View style={styles.tagsContainer}>
-        {item.specialities.map((speciality, index) => (
-          <View key={index} style={styles.tag}>
-            <Text style={styles.tagText}>{speciality}</Text>
+    return (
+      <View style={styles.card}>
+        <View style={styles.header}>
+          
+          {/* Componente de Imagem inserido aqui */}
+          <Image 
+            source={{ uri: imageUrl }} 
+            style={styles.avatarImage} 
+            resizeMode="cover" 
+          />
+
+          <View style={styles.info}>
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.crp}>CRP: {item.crp}</Text>
           </View>
-        ))}
+        </View>
+
+        <View style={styles.tagsContainer}>
+          {item.specialities.map((speciality, index) => (
+            <View key={index} style={styles.tag}>
+              <Text style={styles.tagText}>{speciality}</Text>
+            </View>
+          ))}
+        </View>
+
+        {item.bio && (
+          <Text style={styles.bio} numberOfLines={3}>
+            {item.bio}
+          </Text>
+        )}
+
+        <TouchableOpacity
+          style={[styles.button, !item.contactLink && styles.buttonDisabled]}
+          onPress={() => handleContact(item.contactLink)}
+          disabled={!item.contactLink}
+        >
+          <Text style={styles.buttonText}>Entrar em Contato</Text>
+        </TouchableOpacity>
       </View>
-
-      {item.bio && (
-        <Text style={styles.bio} numberOfLines={3}>
-          {item.bio}
-        </Text>
-      )}
-
-      <TouchableOpacity
-        style={[styles.button, !item.contactLink && styles.buttonDisabled]}
-        onPress={() => handleContact(item.contactLink)}
-        disabled={!item.contactLink}
-      >
-        <Text style={styles.buttonText}>Entrar em Contato</Text>
-      </TouchableOpacity>
-    </View>
-  );
+    );
+  };
 
   if (loading) {
     return (
@@ -126,16 +138,16 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   header: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
-  avatarPlaceholder: {
+  
+  // Substituimos o avatarPlaceholder e avatarText por este estilo da imagem:
+  avatarImage: {
     width: 50,
     height: 50,
     borderRadius: 25,
     backgroundColor: "#e0e7ff",
-    justifyContent: "center",
-    alignItems: "center",
     marginRight: 12,
   },
-  avatarText: { fontSize: 20, fontWeight: "bold", color: "#4f46e5" },
+  
   info: { flex: 1 },
   name: { fontSize: 18, fontWeight: "bold", color: "#1e293b" },
   crp: { fontSize: 12, color: "#64748b", marginTop: 2 },
