@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// eslint-disable-next-line import/no-named-as-default-member
 export const api = axios.create({
   baseURL: "https://sereni.onrender.com",
 });
