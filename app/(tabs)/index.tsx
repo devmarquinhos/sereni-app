@@ -1,8 +1,9 @@
 import { useRouter } from "expo-router";
-import { AlertCircle, ChevronRight, Heart, Wind, X} from "lucide-react-native";
+import { AlertCircle, ChevronRight, Heart, Wind, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -18,25 +19,37 @@ import { api } from "../../src/services/api";
 export default function HomeScreen() {
   const [user, setUser] = useState<{ name: string } | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [newMood, setNewMood] = useState<number | null>(null); // Ajuste o tipo se o seu 'level' for string
-  const [newText, setNewText] = useState('');
+  const [newMood, setNewMood] = useState<number | null>(null);
+  const [newText, setNewText] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const handleSave = async () => {
-    setSaving(true);
-    // Aqui vai a lógica da sua API
-    console.log(`Salvando humor level: ${newMood} | Texto: ${newText}`);
-    
-    // Simula tempo de rede e fecha o modal
-    setTimeout(() => {
-      setSaving(false);
+  async function handleSave() {
+    if (!newText.trim()) {
+      Alert.alert("Opa!", "Escreva pelo menos uma frase sobre seu dia.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      await api.post("/journal", {
+        mood_rating: newMood,
+        entry_text: newText,
+      });
+
+      setNewText("");
+      setNewMood(3);
       setModalVisible(false);
-      setNewText('');
-      setNewMood(null);
-    }, 1000);
-  };
+
+      Alert.alert("Sucesso!", "Seu registro foi salvo no diário.");
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível salvar.");
+      console.log(error);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   const moodOptions = [
     { level: 1, emoji: "😡", color: "bg-red-100" },
@@ -162,7 +175,7 @@ export default function HomeScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* modal de nota diária, vinculada nos emojis */}
       <Modal
         visible={isModalVisible}
@@ -234,7 +247,6 @@ export default function HomeScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      
     </SafeAreaView>
   );
 }
