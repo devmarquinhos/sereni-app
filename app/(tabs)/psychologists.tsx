@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Linking,
+  Image,
 } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from "../../src/services/api";
@@ -26,9 +28,9 @@ export default function PsychologistsScreen() {
   const [professionals, setProfessionals] = useState<Psychologist[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     loadProfessionals();
-  }, []);
+  }, []));
 
   const loadProfessionals = async () => {
     try {
